@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Manrope } from "next/font/google";
+import { Bricolage_Grotesque, Inter } from "next/font/google";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { MotionProvider } from "@/components/layout/MotionProvider";
@@ -7,8 +7,9 @@ import { images } from "@/data/images";
 import { siteConfig } from "@/data/site";
 import "./globals.css";
 
-const manrope = Manrope({
-  variable: "--font-manrope",
+/** Display face for headings; Inter carries body text. */
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
   subsets: ["latin"],
   display: "swap",
 });
@@ -45,13 +46,13 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     title: `${siteConfig.name} | Premium Construction & Design-Build`,
     description: siteConfig.description,
-    images: [{ url: images.heroTowers.src, width: 1200, height: 630, alt: images.heroTowers.alt }],
+    images: [{ url: images.studio.src, width: 1200, height: 630, alt: images.studio.alt }],
   },
   twitter: {
     card: "summary_large_image",
     title: siteConfig.name,
     description: siteConfig.description,
-    images: [images.heroTowers.src],
+    images: [images.studio.src],
   },
   robots: { index: true, follow: true },
 };
@@ -83,11 +84,11 @@ const organizationJsonLd = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${manrope.variable} ${inter.variable} antialiased`}>
+    <html lang="en" className={`${bricolage.variable} ${inter.variable} antialiased`}>
       <body className="flex min-h-dvh flex-col">
         <a
           href="#main"
-          className="sr-only z-100 rounded-full bg-orange px-5 py-3 font-display text-sm font-semibold text-white focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
+          className="sr-only z-100 bg-navy-deep px-5 py-3 text-sm text-white focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
         >
           Skip to content
         </a>

@@ -1,11 +1,10 @@
-import type { NavItem } from "@/types";
+import type { NavItem, SectionId } from "@/types";
 
 export const siteConfig = {
   name: "Rathod Construction",
-  shortName: "Rathod",
   tagline: "Building with precision. Delivering with integrity.",
   description:
-    "Rathod Construction is a design-led construction company delivering premium residential, commercial, interior and industrial projects with uncompromising quality, transparency and craftsmanship.",
+    "Rathod Construction is a design-led construction studio delivering premium residential, commercial, interior and industrial projects with uncompromising quality, transparency and craftsmanship.",
   url: "https://www.rathodconstruction.com",
   foundedYear: 2008,
   logo: {
@@ -32,23 +31,21 @@ export const siteConfig = {
     ],
   },
   socials: [
-    { label: "LinkedIn", href: "https://www.linkedin.com", icon: "linkedin" },
-    { label: "Instagram", href: "https://www.instagram.com", icon: "instagram" },
-    { label: "Facebook", href: "https://www.facebook.com", icon: "facebook" },
-    { label: "X", href: "https://x.com", icon: "x" },
+    { label: "LinkedIn", href: "https://www.linkedin.com" },
+    { label: "Instagram", href: "https://www.instagram.com" },
+    { label: "Facebook", href: "https://www.facebook.com" },
   ],
 } as const;
 
-export type SocialIconName = (typeof siteConfig.socials)[number]["icon"];
-
+/** Header navigation — every item scrolls to a section of the single page. */
 export const mainNav: NavItem[] = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Services", href: "/services" },
-  { label: "Projects", href: "/projects" },
-  { label: "Team", href: "/team" },
-  { label: "Testimonials", href: "/testimonials" },
-  { label: "Contact", href: "/contact" },
+  { label: "About", section: "about" },
+  { label: "Services", section: "services" },
+  { label: "Projects", section: "projects" },
+  { label: "Why Us", section: "why-us" },
+  { label: "Process", section: "process" },
+  { label: "Testimonials", section: "testimonials" },
+  { label: "Contact", section: "contact" },
 ];
 
-export const quoteCta: NavItem = { label: "Get a Quote", href: "/get-a-quote" };
+export const quoteCta: { label: string; section: SectionId } = { label: "Get a Quote", section: "contact" };

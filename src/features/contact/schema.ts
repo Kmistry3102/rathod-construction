@@ -1,20 +1,28 @@
 import { z } from "zod";
-import { fields } from "@/lib/validation";
+import { defaultCountry } from "@/data/forms";
+import { fields, mobileIssue } from "@/lib/validation";
 
-export const contactSchema = z.object({
-  name: fields.name,
-  email: fields.email,
-  phone: fields.optionalPhone,
-  subject: fields.select("Please choose a subject."),
-  message: fields.message(20),
-});
+export const contactSchema = z
+  .object({
+    name: fields.name,
+    email: fields.email,
+    countryCode: fields.countryCode,
+    mobile: fields.mobile,
+    projectType: fields.select("Please choose a project type."),
+    message: fields.message(20),
+  })
+  .superRefine((values, ctx) => {
+    const issue = mobileIssue(values.countryCode, values.mobile);
+    if (issue) ctx.addIssue({ code: "custom", path: ["mobile"], message: issue });
+  });
 
 export type ContactFormValues = z.infer<typeof contactSchema>;
 
 export const contactDefaults: ContactFormValues = {
   name: "",
   email: "",
-  phone: "",
-  subject: "",
+  countryCode: defaultCountry.iso,
+  mobile: "",
+  projectType: "",
   message: "",
 };

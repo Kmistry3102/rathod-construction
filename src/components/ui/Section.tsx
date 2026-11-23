@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import type { SectionId } from "@/types";
 
 type SectionTone = "ivory" | "white" | "beige" | "navy";
 
@@ -16,22 +17,23 @@ interface ContainerProps extends ComponentProps<"div"> {
 
 export function Container({ className, children, ...props }: ContainerProps) {
   return (
-    <div className={cn("mx-auto w-full max-w-(--container-max) px-5 sm:px-8 lg:px-10", className)} {...props}>
+    <div className={cn("mx-auto w-full max-w-(--container-max) px-6 sm:px-10 lg:px-14", className)} {...props}>
       {children}
     </div>
   );
 }
 
-interface SectionProps extends ComponentProps<"section"> {
+interface SectionProps extends Omit<ComponentProps<"section">, "id"> {
+  /** Anchor used by the navigation; offsets for the sticky header. */
+  id: SectionId;
   tone?: SectionTone;
-  /** Removes the default vertical rhythm, for full-bleed sections. */
-  flush?: boolean;
   containerClassName?: string;
 }
 
-export function Section({ tone = "ivory", flush, className, containerClassName, children, ...props }: SectionProps) {
+/** A homepage section with controlled editorial spacing. */
+export function Section({ id, tone = "ivory", className, containerClassName, children, ...props }: SectionProps) {
   return (
-    <section className={cn(tones[tone], !flush && "py-20 sm:py-24 lg:py-32", className)} {...props}>
+    <section id={id} className={cn(tones[tone], "scroll-mt-(--header-height) py-16 sm:py-20 lg:py-24", className)} {...props}>
       <Container className={containerClassName}>{children}</Container>
     </section>
   );

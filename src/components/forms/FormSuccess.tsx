@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CircleCheck } from "lucide-react";
+import { easeOutExpo } from "@/components/motion/easing";
 import { Button } from "@/components/ui/Button";
 
 interface FormSuccessProps {
@@ -15,17 +15,15 @@ export function FormSuccess({ title, message, onReset, resetLabel = "Send anothe
   return (
     <motion.div
       role="status"
-      initial={{ opacity: 0, scale: 0.97 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="flex flex-col items-center py-12 text-center"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: easeOutExpo }}
+      className="border-t border-line py-14"
     >
-      <span className="inline-flex size-16 items-center justify-center rounded-full bg-orange/12 text-orange">
-        <CircleCheck aria-hidden className="size-8" strokeWidth={1.75} />
-      </span>
-      <h3 className="mt-6 font-display text-2xl font-semibold text-navy-deep">{title}</h3>
-      <p className="mt-3 max-w-md leading-relaxed text-slate">{message}</p>
-      <Button variant="outline" className="mt-8" onClick={onReset}>
+      <p className="font-display text-[0.7rem] font-semibold tracking-[0.3em] text-orange uppercase">Received</p>
+      <h3 className="mt-6 font-display text-2xl font-normal tracking-[-0.02em] text-navy-deep sm:text-3xl">{title}</h3>
+      <p className="mt-5 max-w-md leading-[1.8] text-slate">{message}</p>
+      <Button variant="outline" className="mt-10" onClick={onReset}>
         {resetLabel}
       </Button>
     </motion.div>

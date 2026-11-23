@@ -1,26 +1,103 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------
+   Rathod Construction — design tokens
+   All brand values live here. Components reference them through the
+   Tailwind theme below (e.g. bg-navy, text-orange, font-display).
+------------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand palette */
+  --brand-navy-deep: #103342;
+  --brand-navy: #154053;
+  --brand-orange: #e17024;
+  --brand-orange-dark: #c55d17;
+  --brand-ivory: #faf8f4;
+  --brand-beige: #f2eae1;
+  --brand-grey-soft: #e5e4e0;
+  --brand-slate: #68747a;
+  --brand-white: #ffffff;
+
+  /* Semantic */
+  --background: var(--brand-ivory);
+  --foreground: var(--brand-navy-deep);
+  --muted: var(--brand-slate);
+  --border: var(--brand-grey-soft);
+
+  /* Layout */
+  --header-height: 5rem;
+  --container-max: 80rem;
 }
 
 @theme inline {
+  --color-navy-deep: var(--brand-navy-deep);
+  --color-navy: var(--brand-navy);
+  --color-orange: var(--brand-orange);
+  --color-orange-dark: var(--brand-orange-dark);
+  --color-ivory: var(--brand-ivory);
+  --color-beige: var(--brand-beige);
+  --color-grey-soft: var(--brand-grey-soft);
+  --color-slate: var(--brand-slate);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--brand-orange);
+    color: var(--brand-white);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--brand-orange);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Architectural grid lines used as a subtle background texture */
+  .bg-blueprint {
+    background-image:
+      linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
 }

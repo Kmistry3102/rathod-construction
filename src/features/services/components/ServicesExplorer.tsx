@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 export interface ExplorerService {
   slug: string;
   title: string;
+  shortTitle: string;
   summary: string;
   image: ImageAsset;
 }
@@ -34,13 +35,13 @@ export function ServicesExplorer({ services }: { services: ExplorerService[] }) 
   };
 
   return (
-    <div className="grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-16">
+    <div className="grid gap-6 sm:gap-10 lg:grid-cols-12 lg:items-center lg:gap-16">
       {/* Preview */}
       <div
         id={`${baseId}-panel`}
         role="tabpanel"
         aria-labelledby={`${baseId}-tab-${active}`}
-        className="relative aspect-4/3 overflow-hidden bg-beige lg:order-last lg:col-span-6"
+        className="relative aspect-16/10 overflow-hidden sm:aspect-4/3 bg-beige lg:order-last lg:col-span-6"
       >
         {services.map((service, index) => (
           <motion.div
@@ -60,7 +61,7 @@ export function ServicesExplorer({ services }: { services: ExplorerService[] }) 
             />
           </motion.div>
         ))}
-        <div className="absolute inset-x-0 bottom-0 bg-navy-deep/80 px-6 py-5 text-white backdrop-blur-[2px] sm:px-7">
+        <div className="absolute inset-x-0 bottom-0 bg-navy-deep/80 px-5 py-4 sm:py-5 text-white backdrop-blur-[2px] sm:px-7">
           <motion.div
             key={current.slug}
             initial={{ opacity: 0, y: 6 }}
@@ -68,13 +69,13 @@ export function ServicesExplorer({ services }: { services: ExplorerService[] }) 
             transition={{ duration: 0.5, ease: easeOutExpo }}
           >
             <p className="font-display text-lg">{current.title}</p>
-            <p className="mt-1 text-sm text-white/70">{current.summary}</p>
+            <p className="mt-1 hidden text-sm text-white/70 sm:block">{current.summary}</p>
           </motion.div>
         </div>
       </div>
 
       {/* Index */}
-      <div role="tablist" aria-label="Services" aria-orientation="vertical" className="border-t border-line lg:col-span-6">
+      <div role="tablist" aria-label="Services" aria-orientation="vertical" className="grid grid-cols-2 gap-x-6 border-t border-line sm:block lg:col-span-6">
         {services.map((service, index) => {
           const selected = index === active;
           return (
@@ -89,24 +90,25 @@ export function ServicesExplorer({ services }: { services: ExplorerService[] }) 
               onClick={() => setActive(index)}
               onMouseEnter={() => setActive(index)}
               onKeyDown={onKeyDown}
-              className="group flex w-full items-center gap-6 border-b border-line py-5 text-left"
+              className="group flex w-full items-center gap-3 border-b border-line py-3.5 text-left sm:gap-6 sm:py-5"
             >
               <span className={cn("w-6 shrink-0 font-display text-xs transition-colors", selected ? "text-orange" : "text-slate")}>
                 {String(index + 1).padStart(2, "0")}
               </span>
               <span
                 className={cn(
-                  "flex-1 font-display text-xl font-normal tracking-[-0.015em] transition-[color,translate] duration-500 ease-premium sm:text-2xl",
+                  "flex-1 font-display text-base font-normal tracking-[-0.015em] transition-[color,translate] duration-500 ease-premium sm:text-2xl",
                   selected ? "translate-x-1.5 text-navy-deep" : "text-slate group-hover:text-navy-deep",
                 )}
               >
-                {service.title}
+                <span className="sm:hidden">{service.shortTitle}</span>
+                <span className="hidden sm:inline">{service.title}</span>
               </span>
               <ArrowRight
                 aria-hidden
                 strokeWidth={1.5}
                 className={cn(
-                  "size-5 shrink-0 transition-all duration-500 ease-premium",
+                  "hidden size-5 shrink-0 transition-all sm:block duration-500 ease-premium",
                   selected ? "translate-x-0 text-orange opacity-100" : "-translate-x-2 text-slate opacity-0",
                 )}
               />

@@ -18,7 +18,7 @@ export function ContactSection() {
     <Section id="contact" tone="white" aria-labelledby="contact-heading">
       <div className="grid overflow-hidden rounded-[12px] border border-line lg:grid-cols-12">
         {/* Details panel */}
-        <div className="bg-navy-deep p-8 text-white sm:p-10 lg:col-span-5 lg:p-12">
+        <div className="bg-navy-deep p-6 text-white sm:p-10 lg:col-span-5 lg:p-10">
           <SectionHeading
             id="contact-heading"
             light
@@ -34,7 +34,7 @@ export function ContactSection() {
           />
 
           <Reveal delay={0.2}>
-            <dl className="mt-10 divide-y divide-white/12 border-y border-white/12">
+            <dl className="mt-6 divide-y sm:mt-8 divide-white/12 border-y border-white/12">
               {details.map((item) => (
                 <div key={item.label} className="flex gap-6 py-4">
                   <dt className="w-14 shrink-0 pt-0.5 text-[0.65rem] font-semibold tracking-[0.26em] text-white/50 uppercase">
@@ -54,7 +54,7 @@ export function ContactSection() {
             </dl>
           </Reveal>
 
-          <Reveal delay={0.25} className="mt-8">
+          <Reveal delay={0.25} className="mt-8 hidden sm:block">
             <Eyebrow light className="mb-4">
               Studio hours
             </Eyebrow>
@@ -70,7 +70,7 @@ export function ContactSection() {
         </div>
 
         {/* Form */}
-        <Reveal delay={0.15} className="flex items-center p-8 sm:p-10 lg:col-span-7 lg:p-12 xl:p-14">
+        <Reveal delay={0.15} className="flex items-center p-6 sm:p-10 lg:col-span-7 lg:p-10 xl:p-12">
           <div className="w-full">
             <ContactForm />
           </div>

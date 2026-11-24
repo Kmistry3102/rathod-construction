@@ -7,7 +7,7 @@ import { ServicesExplorer } from "@/features/services/components/ServicesExplore
 /** Services as an interactive index with a photographic preview. */
 export function ServicesSection() {
   // Only serialisable fields cross into the client component (icons are functions).
-  const items = services.map(({ slug, title, summary, image }) => ({ slug, title, summary, image }));
+  const items = services.map(({ slug, title, shortTitle, summary, image }) => ({ slug, title, shortTitle, summary, image }));
 
   return (
     <Section id="services" tone="white" aria-labelledby="services-heading">
@@ -24,7 +24,7 @@ export function ServicesSection() {
         </Reveal>
       </div>
 
-      <Reveal delay={0.1} className="mt-12">
+      <Reveal delay={0.1} className="mt-8 sm:mt-12">
         <ServicesExplorer services={items} />
       </Reveal>
     </Section>

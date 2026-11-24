@@ -3,11 +3,11 @@ import type { Highlight, ProcessStep } from "@/types";
 export const missionVision = [
   {
     title: "Our mission",
-    description: "To build spaces of lasting value, with honesty and care.",
+    description: "Build spaces of lasting value — honestly priced, carefully made and delivered as promised.",
   },
   {
     title: "Our vision",
-    description: "To be India's most trusted design-led builder.",
+    description: "To be the builder families and businesses across India trust first.",
   },
 ];
 

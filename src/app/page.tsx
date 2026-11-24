@@ -1,4 +1,5 @@
 import { AboutSection } from "@/features/about/components/AboutSection";
+// import { MissionVisionSection } from "@/features/about/components/MissionVisionSection";
 import { ProcessSection } from "@/features/company/components/ProcessSection";
 import { WhyChooseUsSection } from "@/features/company/components/WhyChooseUsSection";
 import { ContactSection } from "@/features/contact/components/ContactSection";
@@ -13,6 +14,7 @@ export default function HomePage() {
     <>
       <HeroSection />
       <AboutSection />
+      {/* <MissionVisionSection /> */}
       <ServicesSection />
       <ProjectsSection />
       <WhyChooseUsSection />

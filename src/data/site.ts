@@ -5,7 +5,7 @@ export const siteConfig = {
   tagline: "Building with precision. Delivering with integrity.",
   description:
     "Rathod Construction is a design-led construction studio delivering premium residential, commercial, interior and industrial projects with uncompromising quality, transparency and craftsmanship.",
-  url: "https://www.rathodconstruction.com",
+  url: "https://www.rathodconstruction.in",
   foundedYear: 2008,
   logo: {
     src: "/brand/rathod-logo.png",
@@ -16,8 +16,8 @@ export const siteConfig = {
   contact: {
     phone: "+91 98765 43210",
     phoneHref: "tel:+919876543210",
-    email: "hello@rathodconstruction.com",
-    emailHref: "mailto:hello@rathodconstruction.com",
+    email: "hello@rathodconstruction.in",
+    emailHref: "mailto:hello@rathodconstruction.in",
     address: {
       line1: "Rathod House, 4th Floor, S.G. Highway",
       line2: "Ahmedabad, Gujarat 380054",

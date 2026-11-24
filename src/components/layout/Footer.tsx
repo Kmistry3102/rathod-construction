@@ -15,7 +15,7 @@ export function Footer() {
   const { contact } = siteConfig;
 
   return (
-    <footer className="border-t border-line bg-white text-navy-deep">
+    <footer className="border-t border-line bg-ivory text-navy-deep">
       <Container>
         <div className="grid gap-12 py-16 sm:grid-cols-2 lg:grid-cols-12 lg:gap-10 lg:py-20">
           <div className="sm:col-span-2 lg:col-span-4">
@@ -67,20 +67,6 @@ export function Footer() {
           <p>
             © <CurrentYear /> {siteConfig.name}. All rights reserved.
           </p>
-          <ul className="flex gap-8" aria-label="Social media">
-            {siteConfig.socials.map((social) => (
-              <li key={social.label}>
-                <a
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="tracking-[0.2em] uppercase transition-colors hover:text-orange"
-                >
-                  {social.label}
-                </a>
-              </li>
-            ))}
-          </ul>
         </div>
       </Container>
     </footer>

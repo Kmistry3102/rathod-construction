@@ -6,7 +6,7 @@ export const siteConfig = {
   description:
     "Rathod Construction is a design-led construction studio delivering premium residential, commercial, interior and industrial projects with uncompromising quality, transparency and craftsmanship.",
   url: "https://www.rathodconstruction.in",
-  foundedYear: 2008,
+  foundedYear: 1995,
   logo: {
     src: "/brand/rathod-logo.png",
     width: 673,
@@ -14,8 +14,8 @@ export const siteConfig = {
     alt: "Rathod Construction logo",
   },
   contact: {
-    phone: "+91 98765 43210",
-    phoneHref: "tel:+919876543210",
+    phone: "+91 8188877766",
+    phoneHref: "tel:+918188877766",
     email: "rathodconstruction7766@gmail.com",
     emailHref: "mailto:rathodconstruction7766@gmail.com",
     address: {
@@ -24,26 +24,16 @@ export const siteConfig = {
       country: "India",
     },
     mapsHref: "https://maps.google.com/?q=S.G.+Highway+Ahmedabad",
-    hours: [
-      { days: "Monday – Friday", time: "9:00 AM – 7:00 PM" },
-      { days: "Saturday", time: "10:00 AM – 4:00 PM" },
-      { days: "Sunday", time: "Closed" },
-    ],
   },
-  socials: [
-    { label: "LinkedIn", href: "https://www.linkedin.com" },
-    { label: "Instagram", href: "https://www.instagram.com" },
-    { label: "Facebook", href: "https://www.facebook.com" },
-  ],
 } as const;
 
 /** Header navigation — every item scrolls to a section of the single page. */
 export const mainNav: NavItem[] = [
   { label: "About", section: "about" },
-  { label: "Services", section: "services" },
-  { label: "Projects", section: "projects" },
   { label: "Why Us", section: "why-us" },
+  { label: "Services", section: "services" },
   { label: "Process", section: "process" },
+  { label: "Projects", section: "projects" },
   { label: "Testimonials", section: "testimonials" },
   { label: "Contact", section: "contact" },
 ];

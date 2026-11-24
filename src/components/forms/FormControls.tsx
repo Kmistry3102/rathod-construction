@@ -149,7 +149,7 @@ export function PhoneField({ id, label, required, error, country, numberProps, p
           {required && <RequiredMark />}
         </label>
 
-        <div className="w-28 shrink-0">{country}</div>
+        <div className="shrink-0">{country}</div>
         <span aria-hidden className="mt-6 mb-2.5 w-px bg-line-strong/60" />
 
         <input
@@ -160,7 +160,7 @@ export function PhoneField({ id, label, required, error, country, numberProps, p
           placeholder={placeholder}
           aria-invalid={invalid || undefined}
           aria-describedby={invalid ? `${id}-error` : undefined}
-          className="min-w-0 flex-1 rounded-r-[10px] bg-transparent pt-5 pr-4 pb-1.5 pl-3 text-[0.95rem] text-navy-deep outline-none placeholder:text-slate/45"
+          className="min-w-0 flex-1 rounded-r-[10px] bg-transparent pt-5 pr-3 pb-1.5 pl-3 text-[0.95rem] text-navy-deep outline-none placeholder:text-slate/45"
           {...numberProps}
         />
       </div>

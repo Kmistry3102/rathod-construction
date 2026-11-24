@@ -23,7 +23,7 @@ const sizes: Record<ButtonSize, string> = {
  */
 function buttonStyles(variant: ButtonVariant, size: ButtonSize, className?: string) {
   return cn(
-    "group inline-flex items-center justify-center gap-2.5 rounded-[10px] font-medium",
+    "group inline-flex shrink-0 items-center justify-center gap-2.5 rounded-[10px] font-medium whitespace-nowrap",
     "transition-[background-color,border-color,color,translate] duration-500 ease-premium hover:-translate-y-0.5",
     "disabled:pointer-events-none disabled:opacity-60",
     variants[variant],

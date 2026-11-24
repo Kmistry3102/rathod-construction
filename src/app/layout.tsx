@@ -80,7 +80,6 @@ const organizationJsonLd = {
     postalCode: "380054",
     addressCountry: "IN",
   },
-  sameAs: siteConfig.socials.map((social) => social.href),
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

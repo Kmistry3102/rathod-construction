@@ -1,197 +1,177 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useSyncExternalStore, type ReactNode } from "react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { A11y, Keyboard } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-import type { Swiper as SwiperInstance } from "swiper";
-import "swiper/css";
+import { useCallback, useState, type ReactNode } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { MapPin } from "lucide-react";
+import { easeOutExpo } from "@/components/motion/easing";
 import type { Project } from "@/types";
 import { cn } from "@/lib/utils";
 
+const AUTOPLAY_MS = 6000;
 const pad = (value: number) => String(value).padStart(2, "0");
 
-const noopSubscribe = () => () => {};
-
 /**
- * Swiper reads the clock while it builds itself, which Cache Components does
- * not allow during prerender. So the server (and hydration) render the same
- * cards as a plain row, and Swiper takes over once running in the browser.
- */
-function useIsClient() {
-  return useSyncExternalStore(noopSubscribe, () => true, () => false);
-}
-
-/**
- * Horizontal project slider built on Swiper: a row of cards that runs off the
- * right edge of the page, dragged or swiped, or moved with the arrow buttons
- * and keyboard, with a thin progress line and a running counter.
+ * Cinematic showcase: one project fills a large stage (slow zoom, crossfade)
+ * with its details over the photo, and a thumbnail strip below picks between
+ * them. Advances when the active thumbnail's progress line fills; hovering or
+ * focusing pauses it, and it stays put for reduced motion. Swipe on touch.
  */
 export function ProjectsShowcase({ projects, heading }: { projects: Project[]; heading: ReactNode }) {
-  const isClient = useIsClient();
-  const [swiper, setSwiper] = useState<SwiperInstance | null>(null);
-  const [state, setState] = useState({ active: 0, progress: 0, start: true, end: false });
-
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const reduceMotion = useReducedMotion();
   const total = projects.length;
+  const current = projects[active];
 
-  const sync = (instance: SwiperInstance) =>
-    setState({
-      // At the far end the last card may not reach the left edge, so count it as reached.
-      active: instance.isEnd ? total - 1 : instance.activeIndex,
-      progress: Math.min(1, Math.max(0, instance.progress)),
-      start: instance.isBeginning,
-      end: instance.isEnd,
-    });
-
-  const controls = (
-    <>
-      <Counter active={state.active} total={total} />
-      <Arrows
-        start={state.start}
-        end={state.end}
-        onPrev={() => swiper?.slidePrev()}
-        onNext={() => swiper?.slideNext()}
-      />
-    </>
-  );
+  const go = useCallback((step: number) => setActive((i) => (i + step + total) % total), [total]);
 
   return (
-    <div>
-      <div className="flex items-end justify-between gap-6">
-        {heading}
-        <div className="hidden shrink-0 items-center gap-5 sm:flex">{controls}</div>
-      </div>
+    <div
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Featured projects"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
+    >
+      {heading}
 
-      {/* Bleeds to the right edge of the screen */}
-      <div className="-mr-6 mt-8 sm:-mr-10 sm:mt-10 lg:-mr-14">
-        {isClient ? (
-          <Swiper
-            modules={[A11y, Keyboard]}
-            onSwiper={(instance) => {
-              setSwiper(instance);
-              sync(instance);
-            }}
-            onSlideChange={sync}
-            onProgress={sync}
-            onResize={sync}
-            slidesPerView={1.2}
-            spaceBetween={16}
-            speed={800}
-            grabCursor
-            watchSlidesProgress
-            keyboard={{ enabled: true, onlyInViewport: true }}
-            a11y={{ prevSlideMessage: "Previous project", nextSlideMessage: "Next project" }}
-            breakpoints={{
-              640: { slidesPerView: 2.15, spaceBetween: 24 },
-              1024: { slidesPerView: 2.6, spaceBetween: 24 },
-            }}
-            aria-label="Featured projects"
+      {/* Stage */}
+      <motion.div
+        onPanEnd={(_, info) => {
+          if (Math.abs(info.offset.x) > 50 && Math.abs(info.offset.x) > Math.abs(info.offset.y)) go(info.offset.x < 0 ? 1 : -1);
+        }}
+        className="relative mt-8 h-[clamp(20rem,calc(100svh-var(--header-height)-21rem),36rem)] touch-pan-y overflow-hidden rounded-xl bg-navy sm:mt-10"
+      >
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={current.slug}
+            className="absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1, ease: easeOutExpo }}
           >
-            {projects.map((project, index) => (
-              <SwiperSlide key={project.slug} className="group">
-                <ProjectCard project={project} index={index} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        ) : (
-          // Same widths and gaps as the Swiper breakpoints above, so nothing jumps on hand-over.
-          <ul className="flex overflow-hidden">
-            {projects.map((project, index) => (
-              <li
-                key={project.slug}
-                className="group mr-4 w-[calc((100%-3.2px)/1.2)] shrink-0 sm:mr-6 sm:w-[calc((100%-27.6px)/2.15)] lg:w-[calc((100%-38.4px)/2.6)]"
-              >
-                <ProjectCard project={project} index={index} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+            <motion.div
+              className="absolute inset-0"
+              initial={{ scale: reduceMotion ? 1 : 1.1 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: AUTOPLAY_MS / 1000 + 1.5, ease: "linear" }}
+            >
+              <Image
+                src={current.image.src}
+                alt={current.image.alt}
+                fill
+                draggable={false}
+                priority={active === 0}
+                sizes="(min-width: 1400px) 86rem, 100vw"
+                className="object-cover"
+              />
+            </motion.div>
+          </motion.div>
+        </AnimatePresence>
 
-      {/* Progress, plus counter and arrows on phones */}
-      <div className="mt-6 flex items-center gap-5 sm:mt-8">
-        <span aria-hidden className="relative block h-px flex-1 overflow-hidden bg-line-strong">
-          <span
-            className="absolute inset-0 origin-left bg-orange transition-transform duration-700 ease-premium"
-            style={{ transform: `scaleX(${Math.max(state.progress, 1 / total)})` }}
-          />
-        </span>
-        <div className="flex shrink-0 items-center gap-4 sm:hidden">{controls}</div>
-      </div>
-    </div>
-  );
-}
+        <div aria-hidden className="absolute inset-0 bg-linear-to-t from-navy-deep via-navy-deep/25 to-navy-deep/10" />
+        <div aria-hidden className="absolute inset-0 bg-linear-to-r from-navy-deep/50 to-transparent to-60%" />
 
-function ProjectCard({ project, index }: { project: Project; index: number }) {
-  return (
-    <>
-      <div className="relative h-[clamp(14rem,calc(100svh-var(--header-height)-30rem),34rem)] overflow-hidden bg-beige">
-        <Image
-          src={project.image.src}
-          alt={project.image.alt}
-          fill
-          draggable={false}
-          sizes="(min-width: 1024px) 36vw, (min-width: 640px) 46vw, 82vw"
-          className="object-cover transition-transform duration-1000 ease-premium group-hover:scale-[1.04]"
-        />
-        <span className="absolute top-4 left-4 bg-ivory px-2.5 py-1 font-display text-xs text-navy-deep tabular-nums">
-          {pad(index + 1)}
-        </span>
-      </div>
-      <div className="mt-4 flex items-start justify-between gap-4 border-b border-line pb-4">
-        <div className="min-w-0">
-          <p className="text-[0.62rem] font-semibold tracking-[0.24em] text-orange uppercase">{project.category}</p>
-          <h3 className="mt-1.5 truncate font-display text-lg font-normal tracking-[-0.015em] text-navy-deep transition-colors duration-300 group-hover:text-orange sm:text-xl">
-            {project.title}
-          </h3>
-          <p className="mt-1 text-sm text-slate">
-            {project.location} · {project.year}
-          </p>
-        </div>
-        <ArrowRight
+        {/* Oversized index */}
+        <span
           aria-hidden
-          strokeWidth={1.5}
-          className="mt-6 size-5 shrink-0 -translate-x-1 text-slate opacity-0 transition-all duration-500 ease-premium group-hover:translate-x-0 group-hover:text-orange group-hover:opacity-100"
-        />
-      </div>
-    </>
-  );
-}
-
-function Counter({ active, total }: { active: number; total: number }) {
-  return (
-    <p aria-hidden className="font-display text-sm text-slate tabular-nums">
-      <span className="text-navy-deep">{pad(active + 1)}</span> / {pad(total)}
-    </p>
-  );
-}
-
-function Arrows({ start, end, onPrev, onNext }: { start: boolean; end: boolean; onPrev: () => void; onNext: () => void }) {
-  return (
-    <div className="flex gap-2">
-      {[
-        { dir: -1, label: "Previous project", Icon: ArrowLeft, disabled: start, onClick: onPrev },
-        { dir: 1, label: "Next project", Icon: ArrowRight, disabled: end, onClick: onNext },
-      ].map(({ dir, label, Icon, disabled, onClick }) => (
-        <button
-          key={label}
-          type="button"
-          aria-label={label}
-          disabled={disabled}
-          onClick={onClick}
-          className="group inline-flex size-11 items-center justify-center rounded-[10px] border border-navy-deep/25 text-navy-deep transition-[background-color,border-color,color,opacity] duration-500 ease-premium hover:border-navy-deep hover:bg-navy-deep hover:text-white disabled:pointer-events-none disabled:opacity-35"
+          className="pointer-events-none absolute top-4 right-5 font-display text-[4.5rem] leading-none font-light tracking-[-0.04em] text-transparent [-webkit-text-stroke:1px_rgb(255_255_255/0.45)] select-none sm:top-6 sm:right-8 sm:text-[7rem]"
         >
-          <Icon
-            aria-hidden
-            strokeWidth={1.5}
-            className={cn(
-              "size-4 transition-transform duration-500 ease-premium",
-              dir < 0 ? "group-hover:-translate-x-0.5" : "group-hover:translate-x-0.5",
-            )}
-          />
-        </button>
-      ))}
+          {pad(active + 1)}
+        </span>
+
+        {/* Details */}
+        <div aria-live={paused ? "polite" : "off"} className="absolute inset-x-0 bottom-0 p-5 sm:p-8 lg:p-10">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={current.slug}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.6, ease: easeOutExpo }}
+              className="text-white"
+            >
+              <span className="inline-flex items-center rounded-full border border-white/30 px-3 py-1 text-[0.62rem] font-semibold tracking-[0.24em] uppercase backdrop-blur-sm">
+                {current.category}
+              </span>
+              <h3 className="mt-4 max-w-2xl font-display text-[1.75rem] leading-[1.1] font-normal tracking-[-0.025em] sm:text-[2.5rem] lg:text-[3rem]">
+                {current.title}
+              </h3>
+              <dl className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-white/75">
+                <div className="flex items-center gap-2">
+                  <dt className="sr-only">Location</dt>
+                  <MapPin aria-hidden strokeWidth={1.5} className="size-4 text-orange" />
+                  <dd>{current.location}</dd>
+                </div>
+                <span aria-hidden className="hidden h-3 w-px bg-white/30 sm:block" />
+                <div className="flex items-center gap-2">
+                  <dt className="text-white/50">Completed</dt>
+                  <dd className="tabular-nums">{current.year}</dd>
+                </div>
+              </dl>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </motion.div>
+
+      {/* Thumbnail strip */}
+      <div className="mt-4 grid grid-cols-6 gap-2 sm:mt-5 sm:gap-4" role="group" aria-label="Choose project">
+        {projects.map((project, index) => {
+          const selected = index === active;
+          return (
+            <button
+              key={project.slug}
+              type="button"
+              onClick={() => setActive(index)}
+              aria-label={`Show ${project.title}`}
+              aria-pressed={selected}
+              className="group min-w-0 text-left"
+            >
+              <span className="relative block h-0.5 overflow-hidden rounded-full bg-white/15">
+                {index < active && <span className="absolute inset-0 bg-white/50" />}
+                {selected && (
+                  <span
+                    key={active}
+                    className={cn("absolute inset-0 origin-left bg-orange", !reduceMotion && "animate-progress")}
+                    onAnimationEnd={() => go(1)}
+                    style={{
+                      ["--progress-duration" as string]: `${AUTOPLAY_MS}ms`,
+                      animationPlayState: paused ? "paused" : "running",
+                    }}
+                  />
+                )}
+              </span>
+              <span className="mt-3 flex items-center gap-3">
+                <span
+                  className={cn(
+                    "relative block aspect-4/3 w-full shrink-0 overflow-hidden rounded-md transition-opacity duration-500 ease-premium lg:w-16",
+                    selected ? "opacity-100" : "opacity-45 group-hover:opacity-80",
+                  )}
+                >
+                  <Image src={project.image.src} alt="" fill sizes="(min-width: 1024px) 4rem, 16vw" className="object-cover" />
+                </span>
+                <span className="hidden min-w-0 lg:block">
+                  <span className={cn("block font-display text-[0.7rem] tabular-nums", selected ? "text-orange" : "text-white/45")}>
+                    {pad(index + 1)}
+                  </span>
+                  <span
+                    className={cn(
+                      "block truncate text-sm transition-colors duration-500",
+                      selected ? "text-white" : "text-white/55 group-hover:text-white/85",
+                    )}
+                  >
+                    {project.title}
+                  </span>
+                </span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

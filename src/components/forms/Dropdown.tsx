@@ -157,12 +157,12 @@ export function Dropdown({
             (invalid
               ? "border-red-600/60 focus:border-red-600 focus:ring-red-600/10"
               : "border-line-strong/60 focus:border-navy-deep focus:ring-navy-deep/8"),
-          variant === "inline" && "h-full rounded-l-[10px] bg-transparent pt-5 pr-2 pb-1.5 pl-4",
+          variant === "inline" && "h-full gap-1.5 rounded-l-[10px] bg-transparent pt-5 pr-2.5 pb-1.5 pl-3.5",
           className,
         )}
         {...aria}
       >
-        <span className={cn("truncate", selected ? "text-navy-deep" : "text-slate/70")}>
+        <span className={cn(variant === "inline" ? "whitespace-nowrap" : "truncate", selected ? "text-navy-deep" : "text-slate/70")}>
           {selected ? (selected.display ?? selected.label) : placeholder}
         </span>
         <ChevronDown

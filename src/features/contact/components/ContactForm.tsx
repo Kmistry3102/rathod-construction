@@ -41,7 +41,7 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="grid gap-x-5 gap-y-5 sm:grid-cols-2">
+    <form onSubmit={onSubmit} noValidate className="grid grid-cols-1 gap-x-5 gap-y-5 sm:grid-cols-2">
       <Field id="contact-name" label="Full name" required error={errors.name?.message}>
         <Input
           id="contact-name"

@@ -14,11 +14,10 @@ export default function HomePage() {
     <>
       <HeroSection />
       <AboutSection />
-      {/* <MissionVisionSection /> */}
-      <ServicesSection />
-      <ProjectsSection />
       <WhyChooseUsSection />
+      <ServicesSection />
       <ProcessSection />
+      <ProjectsSection />
       <TestimonialsSection />
       <ContactSection />
     </>

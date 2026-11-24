@@ -21,18 +21,18 @@ export const whyChooseUs: Highlight[] = [
 export const workProcess: ProcessStep[] = [
   {
     title: "Consultation",
-    description: "We listen first — understanding your vision, site, budget and timeline.",
+    description: "We listen to your vision.",
   },
   {
     title: "Design & Planning",
-    description: "Drawings, visualisations, approvals and a fixed programme you can rely on.",
+    description: "Drawings, approvals, a fixed plan.",
   },
   {
     title: "Construction",
-    description: "Skilled crews execute with precision under dedicated project managers.",
+    description: "Built with precision.",
   },
   {
     title: "Handover & Care",
-    description: "A meticulous handover, complete documentation and a structured warranty.",
+    description: "Keys, papers and warranty.",
   },
 ];

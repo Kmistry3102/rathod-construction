@@ -16,8 +16,8 @@ export const siteConfig = {
   contact: {
     phone: "+91 98765 43210",
     phoneHref: "tel:+919876543210",
-    email: "hello@rathodconstruction.in",
-    emailHref: "mailto:hello@rathodconstruction.in",
+    email: "rathodconstruction7766@gmail.com",
+    emailHref: "mailto:rathodconstruction7766@gmail.com",
     address: {
       line1: "Rathod House, 4th Floor, S.G. Highway",
       line2: "Ahmedabad, Gujarat 380054",

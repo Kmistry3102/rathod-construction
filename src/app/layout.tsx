@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Inter } from "next/font/google";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { IntroLoader } from "@/components/layout/IntroLoader";
 import { MotionProvider } from "@/components/layout/MotionProvider";
 import { images } from "@/data/images";
 import { siteConfig } from "@/data/site";
@@ -86,6 +87,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${bricolage.variable} ${inter.variable} antialiased`}>
       <body className="flex min-h-dvh flex-col">
+        {/* Without JavaScript the intro can't lift, so never show it. */}
+        <noscript>
+          <style>{"#intro-loader{display:none!important}"}</style>
+        </noscript>
+        <IntroLoader />
         <a
           href="#main"
           className="sr-only z-100 bg-navy-deep px-5 py-3 text-sm text-white focus:not-sr-only focus:fixed focus:top-4 focus:left-4"

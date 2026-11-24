@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { motion, type Variants } from "framer-motion";
 import { easeOutExpo } from "@/components/motion/easing";
+import { useIntroDone } from "@/lib/intro";
 
 interface LineRevealProps {
   /** Each entry is one visual line; lines fade up gently in sequence. */
@@ -11,7 +12,7 @@ interface LineRevealProps {
   className?: string;
   id?: string;
   delay?: number;
-  /** Animate on mount (above the fold) instead of on entering the viewport. */
+  /** Animate once the opening intro lifts (above the fold) instead of on entering the viewport. */
   onMount?: boolean;
 }
 
@@ -28,8 +29,9 @@ const line: Variants = {
 /** Understated headline entrance: each line fades in with a slight upward movement. */
 export function LineReveal({ lines, as = "h2", className, id, delay = 0, onMount }: LineRevealProps) {
   const Tag = motion[as];
+  const introDone = useIntroDone();
   const trigger = onMount
-    ? { animate: "visible" }
+    ? { animate: introDone ? "visible" : "hidden" }
     : { whileInView: "visible", viewport: { once: true, margin: "0px 0px -8% 0px" } };
 
   return (

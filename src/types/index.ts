@@ -1,5 +1,5 @@
 /** IDs of the homepage sections, used for anchors and scroll-spy. */
-export type SectionId = "top" | "about" | "services" | "projects" | "why-us" | "process" | "testimonials" | "contact";
+export type SectionId = "top" | "about" | "mission" | "services" | "projects" | "why-us" | "process" | "testimonials" | "contact";
 
 export interface NavItem {
   label: string;

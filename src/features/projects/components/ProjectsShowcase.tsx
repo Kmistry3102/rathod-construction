@@ -1,177 +1,197 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
-import { AnimatePresence, motion, useInView, useReducedMotion, type PanInfo } from "framer-motion";
-import { ArrowLeft, ArrowRight, Pause, Play } from "lucide-react";
-import { easeOutExpo } from "@/components/motion/easing";
+import { useState, useSyncExternalStore, type ReactNode } from "react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { A11y, Keyboard } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import type { Swiper as SwiperInstance } from "swiper";
+import "swiper/css";
 import type { Project } from "@/types";
 import { cn } from "@/lib/utils";
 
-const AUTOPLAY_SECONDS = 6;
-const SWIPE_THRESHOLD = 60;
+const pad = (value: number) => String(value).padStart(2, "0");
+
+const noopSubscribe = () => () => {};
 
 /**
- * Cinematic project slider: one wide photograph at a time with a caption
- * panel and segmented progress. Auto-advances gently, pausing on hover,
- * focus, when off-screen, on request, and never for reduced-motion users.
+ * Swiper reads the clock while it builds itself, which Cache Components does
+ * not allow during prerender. So the server (and hydration) render the same
+ * cards as a plain row, and Swiper takes over once running in the browser.
  */
-export function ProjectsShowcase({ projects }: { projects: Project[] }) {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(rootRef, { amount: 0.4 });
-  const reduceMotion = useReducedMotion();
-  const [index, setIndex] = useState(0);
-  const [hovered, setHovered] = useState(false);
-  const [focused, setFocused] = useState(false);
-  const [userPaused, setUserPaused] = useState(false);
+function useIsClient() {
+  return useSyncExternalStore(noopSubscribe, () => true, () => false);
+}
+
+/**
+ * Horizontal project slider built on Swiper: a row of cards that runs off the
+ * right edge of the page, dragged or swiped, or moved with the arrow buttons
+ * and keyboard, with a thin progress line and a running counter.
+ */
+export function ProjectsShowcase({ projects, heading }: { projects: Project[]; heading: ReactNode }) {
+  const isClient = useIsClient();
+  const [swiper, setSwiper] = useState<SwiperInstance | null>(null);
+  const [state, setState] = useState({ active: 0, progress: 0, start: true, end: false });
 
   const total = projects.length;
-  const current = projects[index];
-  const autoplay = !reduceMotion && !userPaused;
-  const running = autoplay && inView && !hovered && !focused;
 
-  const go = (step: number) => setIndex((value) => (value + step + total) % total);
+  const sync = (instance: SwiperInstance) =>
+    setState({
+      // At the far end the last card may not reach the left edge, so count it as reached.
+      active: instance.isEnd ? total - 1 : instance.activeIndex,
+      progress: Math.min(1, Math.max(0, instance.progress)),
+      start: instance.isBeginning,
+      end: instance.isEnd,
+    });
 
-  const onDragEnd = (_: unknown, info: PanInfo) => {
-    if (info.offset.x < -SWIPE_THRESHOLD) go(1);
-    else if (info.offset.x > SWIPE_THRESHOLD) go(-1);
-  };
+  const controls = (
+    <>
+      <Counter active={state.active} total={total} />
+      <Arrows
+        start={state.start}
+        end={state.end}
+        onPrev={() => swiper?.slidePrev()}
+        onNext={() => swiper?.slideNext()}
+      />
+    </>
+  );
 
   return (
-    <div
-      ref={rootRef}
-      role="region"
-      aria-roledescription="carousel"
-      aria-label="Featured projects"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onFocus={() => setFocused(true)}
-      onBlur={(event) => !event.currentTarget.contains(event.relatedTarget) && setFocused(false)}
-    >
-      {/* Stage */}
-      <motion.div
-        drag="x"
-        dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.12}
-        onDragEnd={onDragEnd}
-        className="relative aspect-4/5 cursor-grab touch-pan-y overflow-hidden bg-beige active:cursor-grabbing sm:aspect-16/9 lg:aspect-21/9"
-      >
-        {projects.map((project, slide) => (
-          <motion.div
-            key={project.slug}
-            aria-hidden={slide !== index}
-            className="pointer-events-none absolute inset-0"
-            initial={false}
-            animate={{ opacity: slide === index ? 1 : 0, scale: slide === index ? 1 : 1.04 }}
-            transition={{ duration: 1.1, ease: easeOutExpo }}
-          >
-            <Image
-              src={project.image.src}
-              alt={project.image.alt}
-              fill
-              draggable={false}
-              sizes="(min-width: 1440px) 1300px, 100vw"
-              className="object-cover"
-            />
-          </motion.div>
-        ))}
-
-        {/* Caption */}
-        <div className="absolute bottom-0 left-0 max-w-[85%] bg-ivory px-6 py-5 sm:bottom-6 sm:left-6 sm:px-7 sm:py-6 lg:bottom-8 lg:left-8">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={current.slug}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.45, ease: easeOutExpo }}
-              aria-live={running ? "off" : "polite"}
-            >
-              <p className="text-[0.62rem] font-semibold tracking-[0.24em] text-orange uppercase">{current.category}</p>
-              <h3 className="mt-2 font-display text-xl font-normal tracking-[-0.015em] text-navy-deep sm:text-2xl">
-                {current.title}
-              </h3>
-              <p className="mt-1 text-sm text-slate">
-                {current.location} · {current.year}
-              </p>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </motion.div>
-
-      {/* Controls */}
-      <div className="mt-6 flex items-center gap-5">
-        <ol className="flex flex-1 gap-2" aria-label="Choose project">
-          {projects.map((project, slide) => {
-            const active = slide === index;
-            return (
-              <li key={project.slug} className="flex-1">
-                <button
-                  type="button"
-                  onClick={() => setIndex(slide)}
-                  aria-label={`Show ${project.title}`}
-                  aria-current={active ? "true" : undefined}
-                  className="group block w-full py-3"
-                >
-                  <span className="relative block h-px w-full overflow-hidden bg-line-strong transition-colors group-hover:bg-navy-deep/50">
-                    {slide < index && <span className="absolute inset-0 bg-navy-deep/60" />}
-                    {active && (
-                      <span
-                        key={`${index}-${autoplay}`}
-                        onAnimationEnd={() => go(1)}
-                        style={{ ["--progress-duration" as string]: `${AUTOPLAY_SECONDS}s` }}
-                        className={cn(
-                          "absolute inset-0 origin-left bg-orange",
-                          autoplay ? "animate-progress" : "",
-                          !running && "[animation-play-state:paused]",
-                        )}
-                      />
-                    )}
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ol>
-
-        <p className="hidden shrink-0 font-display text-sm tabular-nums text-slate sm:block" aria-hidden>
-          <span className="text-navy-deep">{String(index + 1).padStart(2, "0")}</span> / {String(total).padStart(2, "0")}
-        </p>
-
-        <div className="flex shrink-0 gap-2">
-          {!reduceMotion && (
-            <button
-              type="button"
-              onClick={() => setUserPaused((paused) => !paused)}
-              aria-label={userPaused ? "Play slideshow" : "Pause slideshow"}
-              className="inline-flex size-11 items-center justify-center rounded-[10px] text-navy-deep transition-colors duration-300 hover:text-orange"
-            >
-              {userPaused ? <Play aria-hidden strokeWidth={1.5} className="size-4" /> : <Pause aria-hidden strokeWidth={1.5} className="size-4" />}
-            </button>
-          )}
-          {[
-            { step: -1, label: "Previous project", Icon: ArrowLeft },
-            { step: 1, label: "Next project", Icon: ArrowRight },
-          ].map(({ step, label, Icon }) => (
-            <button
-              key={label}
-              type="button"
-              aria-label={label}
-              onClick={() => go(step)}
-              className="group inline-flex size-11 items-center justify-center rounded-[10px] border border-navy-deep/25 text-navy-deep transition-[background-color,border-color,color] duration-500 ease-premium hover:border-navy-deep hover:bg-navy-deep hover:text-white"
-            >
-              <Icon
-                aria-hidden
-                strokeWidth={1.5}
-                className={cn(
-                  "size-4 transition-transform duration-500 ease-premium",
-                  step < 0 ? "group-hover:-translate-x-0.5" : "group-hover:translate-x-0.5",
-                )}
-              />
-            </button>
-          ))}
-        </div>
+    <div>
+      <div className="flex items-end justify-between gap-6">
+        {heading}
+        <div className="hidden shrink-0 items-center gap-5 sm:flex">{controls}</div>
       </div>
+
+      {/* Bleeds to the right edge of the screen */}
+      <div className="-mr-6 mt-8 sm:-mr-10 sm:mt-10 lg:-mr-14">
+        {isClient ? (
+          <Swiper
+            modules={[A11y, Keyboard]}
+            onSwiper={(instance) => {
+              setSwiper(instance);
+              sync(instance);
+            }}
+            onSlideChange={sync}
+            onProgress={sync}
+            onResize={sync}
+            slidesPerView={1.2}
+            spaceBetween={16}
+            speed={800}
+            grabCursor
+            watchSlidesProgress
+            keyboard={{ enabled: true, onlyInViewport: true }}
+            a11y={{ prevSlideMessage: "Previous project", nextSlideMessage: "Next project" }}
+            breakpoints={{
+              640: { slidesPerView: 2.15, spaceBetween: 24 },
+              1024: { slidesPerView: 2.6, spaceBetween: 24 },
+            }}
+            aria-label="Featured projects"
+          >
+            {projects.map((project, index) => (
+              <SwiperSlide key={project.slug} className="group">
+                <ProjectCard project={project} index={index} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        ) : (
+          // Same widths and gaps as the Swiper breakpoints above, so nothing jumps on hand-over.
+          <ul className="flex overflow-hidden">
+            {projects.map((project, index) => (
+              <li
+                key={project.slug}
+                className="group mr-4 w-[calc((100%-3.2px)/1.2)] shrink-0 sm:mr-6 sm:w-[calc((100%-27.6px)/2.15)] lg:w-[calc((100%-38.4px)/2.6)]"
+              >
+                <ProjectCard project={project} index={index} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* Progress, plus counter and arrows on phones */}
+      <div className="mt-6 flex items-center gap-5 sm:mt-8">
+        <span aria-hidden className="relative block h-px flex-1 overflow-hidden bg-line-strong">
+          <span
+            className="absolute inset-0 origin-left bg-orange transition-transform duration-700 ease-premium"
+            style={{ transform: `scaleX(${Math.max(state.progress, 1 / total)})` }}
+          />
+        </span>
+        <div className="flex shrink-0 items-center gap-4 sm:hidden">{controls}</div>
+      </div>
+    </div>
+  );
+}
+
+function ProjectCard({ project, index }: { project: Project; index: number }) {
+  return (
+    <>
+      <div className="relative h-[clamp(14rem,calc(100svh-var(--header-height)-30rem),34rem)] overflow-hidden bg-beige">
+        <Image
+          src={project.image.src}
+          alt={project.image.alt}
+          fill
+          draggable={false}
+          sizes="(min-width: 1024px) 36vw, (min-width: 640px) 46vw, 82vw"
+          className="object-cover transition-transform duration-1000 ease-premium group-hover:scale-[1.04]"
+        />
+        <span className="absolute top-4 left-4 bg-ivory px-2.5 py-1 font-display text-xs text-navy-deep tabular-nums">
+          {pad(index + 1)}
+        </span>
+      </div>
+      <div className="mt-4 flex items-start justify-between gap-4 border-b border-line pb-4">
+        <div className="min-w-0">
+          <p className="text-[0.62rem] font-semibold tracking-[0.24em] text-orange uppercase">{project.category}</p>
+          <h3 className="mt-1.5 truncate font-display text-lg font-normal tracking-[-0.015em] text-navy-deep transition-colors duration-300 group-hover:text-orange sm:text-xl">
+            {project.title}
+          </h3>
+          <p className="mt-1 text-sm text-slate">
+            {project.location} · {project.year}
+          </p>
+        </div>
+        <ArrowRight
+          aria-hidden
+          strokeWidth={1.5}
+          className="mt-6 size-5 shrink-0 -translate-x-1 text-slate opacity-0 transition-all duration-500 ease-premium group-hover:translate-x-0 group-hover:text-orange group-hover:opacity-100"
+        />
+      </div>
+    </>
+  );
+}
+
+function Counter({ active, total }: { active: number; total: number }) {
+  return (
+    <p aria-hidden className="font-display text-sm text-slate tabular-nums">
+      <span className="text-navy-deep">{pad(active + 1)}</span> / {pad(total)}
+    </p>
+  );
+}
+
+function Arrows({ start, end, onPrev, onNext }: { start: boolean; end: boolean; onPrev: () => void; onNext: () => void }) {
+  return (
+    <div className="flex gap-2">
+      {[
+        { dir: -1, label: "Previous project", Icon: ArrowLeft, disabled: start, onClick: onPrev },
+        { dir: 1, label: "Next project", Icon: ArrowRight, disabled: end, onClick: onNext },
+      ].map(({ dir, label, Icon, disabled, onClick }) => (
+        <button
+          key={label}
+          type="button"
+          aria-label={label}
+          disabled={disabled}
+          onClick={onClick}
+          className="group inline-flex size-11 items-center justify-center rounded-[10px] border border-navy-deep/25 text-navy-deep transition-[background-color,border-color,color,opacity] duration-500 ease-premium hover:border-navy-deep hover:bg-navy-deep hover:text-white disabled:pointer-events-none disabled:opacity-35"
+        >
+          <Icon
+            aria-hidden
+            strokeWidth={1.5}
+            className={cn(
+              "size-4 transition-transform duration-500 ease-premium",
+              dir < 0 ? "group-hover:-translate-x-0.5" : "group-hover:translate-x-0.5",
+            )}
+          />
+        </button>
+      ))}
     </div>
   );
 }

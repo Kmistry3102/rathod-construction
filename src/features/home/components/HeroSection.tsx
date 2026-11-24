@@ -1,11 +1,8 @@
-import { Divider } from "@/components/motion/Divider";
 import { LineReveal } from "@/components/motion/LineReveal";
 import { Reveal } from "@/components/motion/Reveal";
-import { SectionLink } from "@/components/navigation/SectionLink";
 import { ButtonLink } from "@/components/ui/Button";
-import { Container } from "@/components/ui/Section";
+import { Container, fullScreen } from "@/components/ui/Section";
 import { Eyebrow } from "@/components/ui/SectionHeading";
-import { services } from "@/data/services";
 import { quoteCta } from "@/data/site";
 
 const headline = [
@@ -15,11 +12,11 @@ const headline = [
   </span>,
 ];
 
-/** Left-aligned, image-free editorial hero with a quiet index of disciplines beneath it. */
+/** Left-aligned, image-free editorial hero. */
 export function HeroSection() {
   return (
-    <section id="top" aria-labelledby="hero-heading" className="scroll-mt-(--header-height) bg-ivory">
-      <Container className="pt-20 pb-12 sm:pt-24 lg:pt-28 lg:pb-14">
+    <section id="top" aria-labelledby="hero-heading" className={`${fullScreen} scroll-mt-(--header-height) bg-ivory`}>
+      <Container className="py-16 sm:py-20">
         <Reveal onMount y={8}>
           <Eyebrow>Design · Engineering · Construction</Eyebrow>
         </Reveal>
@@ -49,21 +46,6 @@ export function HeroSection() {
           </ButtonLink>
         </Reveal>
 
-        <Divider onMount delay={0.7} className="mt-16 lg:mt-20" />
-        <Reveal onMount delay={0.9} y={6}>
-          <ul aria-label="Our disciplines" className="flex flex-wrap items-center gap-x-8 gap-y-3 pt-6 sm:gap-x-10">
-            {services.map((service) => (
-              <li key={service.slug}>
-                <SectionLink
-                  section="services"
-                  className="text-[0.7rem] font-medium tracking-[0.22em] text-slate uppercase transition-colors duration-300 hover:text-orange"
-                >
-                  {service.shortTitle}
-                </SectionLink>
-              </li>
-            ))}
-          </ul>
-        </Reveal>
       </Container>
     </section>
   );

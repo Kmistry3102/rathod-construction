@@ -7,7 +7,7 @@ import { TestimonialSlider } from "@/features/testimonials/components/Testimonia
 /** Client words, one short quote at a time. */
 export function TestimonialsSection() {
   return (
-    <Section id="testimonials" tone="ivory" aria-labelledby="testimonials-heading">
+    <Section id="testimonials" tone="ivory" fullHeight={false} aria-labelledby="testimonials-heading">
       <Reveal y={10}>
         <Eyebrow as="h2" id="testimonials-heading" index="06" className="justify-center">
           Testimonials

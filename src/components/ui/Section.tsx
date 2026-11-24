@@ -28,12 +28,17 @@ interface SectionProps extends Omit<ComponentProps<"section">, "id"> {
   id: SectionId;
   tone?: SectionTone;
   containerClassName?: string;
+  /** Fill at least one screen with the content centred (default). Off for short bands. */
+  fullHeight?: boolean;
 }
 
-/** A homepage section with controlled editorial spacing. */
-export function Section({ id, tone = "ivory", className, containerClassName, children, ...props }: SectionProps) {
+/** Every homepage section fills at least one screen below the sticky header. */
+export const fullScreen = "flex min-h-[calc(100svh-var(--header-height))] flex-col justify-center";
+
+/** A homepage section with controlled editorial spacing, one screen tall with its content centred. */
+export function Section({ id, tone = "ivory", fullHeight = true, className, containerClassName, children, ...props }: SectionProps) {
   return (
-    <section id={id} className={cn(tones[tone], "scroll-mt-(--header-height) py-16 sm:py-20 lg:py-24", className)} {...props}>
+    <section id={id} className={cn(tones[tone], fullHeight && fullScreen, "scroll-mt-(--header-height) py-12 sm:py-16 lg:py-20", className)} {...props}>
       <Container className={containerClassName}>{children}</Container>
     </section>
   );

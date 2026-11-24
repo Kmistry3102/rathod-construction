@@ -6,7 +6,7 @@ import { whyChooseUs } from "@/data/company";
 /** Four promises set as large single words — airy, with no lines or icons. */
 export function WhyChooseUsSection() {
   return (
-    <Section id="why-us" tone="beige" aria-labelledby="why-heading">
+    <Section id="why-us" tone="beige" fullHeight={false} aria-labelledby="why-heading">
       <Reveal y={10}>
         <Eyebrow as="h2" id="why-heading" index="04">
           Why choose us
@@ -20,7 +20,7 @@ export function WhyChooseUsSection() {
               {item.word}
               <span className="text-orange">.</span>
             </h3>
-            <p className="mt-4 max-w-[14rem] text-sm leading-[1.6] text-slate">{item.caption}</p>
+            <p className="mt-4 max-w-56 text-sm leading-[1.6] text-slate">{item.caption}</p>
           </Reveal>
         ))}
       </ul>

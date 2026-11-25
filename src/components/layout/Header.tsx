@@ -2,18 +2,23 @@
 
 import { useEffect, useLayoutEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
 import { easeOutExpo } from "@/components/motion/easing";
 import { SectionLink } from "@/components/navigation/SectionLink";
 import { useActiveSection } from "@/components/navigation/useActiveSection";
 import { ButtonLink } from "@/components/ui/Button";
 import { mainNav, quoteCta, siteConfig } from "@/data/site";
+import { setProjectFilter, useProjectFilter } from "@/features/projects/projectFilter";
 import { cn } from "@/lib/utils";
 
 const sectionIds = mainNav.map((item) => item.section);
 
 export function Header() {
   const active = useActiveSection(sectionIds);
+  const projectFilter = useProjectFilter();
+  // Hides the hover dropdown after a pick until the pointer leaves it.
+  const [dropdownDismissed, setDropdownDismissed] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
 
@@ -41,28 +46,81 @@ export function Header() {
         transition={{ duration: 0.8, ease: easeOutExpo }}
         className="mx-auto flex h-(--header-height) w-full max-w-(--container-max) items-center gap-8 px-6 sm:px-10 lg:px-14"
       >
-        <Logo eager onNavigate={closeMenu} className="h-12 sm:h-14" />
+        <Logo eager onNavigate={closeMenu} className="h-14 sm:h-16" />
 
         <nav aria-label="Sections" className="hidden flex-1 justify-center xl:flex">
           <ul className="flex items-center gap-7">
             {mainNav.map((item) => {
               const isActive = active === item.section;
               return (
-                <li key={item.section} className="relative">
+                <li
+                  key={item.section}
+                  className="group/item relative"
+                  onMouseLeave={item.children ? () => setDropdownDismissed(false) : undefined}
+                >
                   <SectionLink
                     section={item.section}
                     aria-current={isActive ? "location" : undefined}
+                    aria-haspopup={item.children ? "true" : undefined}
                     className={cn(
-                      "group relative block py-2 text-[0.85rem] transition-colors duration-300",
+                      "group relative flex items-center gap-1 py-2 text-[0.85rem] transition-colors duration-300",
                       isActive ? "text-navy-deep" : "text-slate hover:text-navy-deep",
                     )}
                   >
                     {item.label}
+                    {item.children && (
+                      <ChevronDown
+                        aria-hidden
+                        strokeWidth={1.75}
+                        className="size-3.5 transition-transform duration-300 ease-premium group-hover/item:rotate-180 group-focus-within/item:rotate-180"
+                      />
+                    )}
                     <span
                       aria-hidden
                       className="absolute inset-x-0 bottom-0.5 h-px origin-left scale-x-0 bg-navy-deep/40 transition-transform duration-500 ease-premium group-hover:scale-x-100"
                     />
                   </SectionLink>
+                  {item.children && (
+                    <div
+                      className={cn(
+                        "invisible absolute top-full left-0 translate-y-1 pt-4 opacity-0 transition-all duration-300 ease-premium",
+                        !dropdownDismissed &&
+                          "group-focus-within/item:visible group-focus-within/item:translate-y-0 group-focus-within/item:opacity-100 group-hover/item:visible group-hover/item:translate-y-0 group-hover/item:opacity-100",
+                      )}
+                    >
+                      <ul className="w-60 rounded-[10px] border border-line bg-white p-1.5 shadow-[0_16px_40px_-16px_rgb(16_51_66/0.3)]">
+                        {item.children.map((child) => {
+                          const selected = projectFilter === child.status;
+                          return (
+                            <li key={child.status}>
+                              <SectionLink
+                                section={item.section}
+                                aria-current={selected ? "true" : undefined}
+                                onNavigate={() => {
+                                  setProjectFilter(child.status);
+                                  setDropdownDismissed(true);
+                                  (document.activeElement as HTMLElement | null)?.blur();
+                                }}
+                                className={cn(
+                                  "relative block rounded-md py-2.5 pr-3 pl-4 text-[0.85rem] transition-colors duration-200",
+                                  selected ? "text-navy-deep" : "text-slate hover:bg-ivory hover:text-navy-deep",
+                                )}
+                              >
+                                <span
+                                  aria-hidden
+                                  className={cn(
+                                    "absolute top-1/2 left-1 h-4 w-0.5 -translate-y-1/2 rounded-full bg-orange transition-opacity duration-200",
+                                    selected ? "opacity-100" : "opacity-0",
+                                  )}
+                                />
+                                {child.label}
+                              </SectionLink>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
                   {isActive && (
                     <motion.span
                       aria-hidden
@@ -143,6 +201,24 @@ export function Header() {
                       </span>
                       <span className="text-xs text-slate">{String(index + 1).padStart(2, "0")}</span>
                     </SectionLink>
+                    {item.children && (
+                      <ul className="-mt-1 flex gap-6 pb-4">
+                        {item.children.map((child) => (
+                          <li key={child.status}>
+                            <SectionLink
+                              section={item.section}
+                              onNavigate={() => {
+                                setProjectFilter(child.status);
+                                closeMenu();
+                              }}
+                              className={cn("text-sm", projectFilter === child.status ? "text-orange" : "text-slate")}
+                            >
+                              {child.label}
+                            </SectionLink>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </motion.li>
                 ))}
               </ul>

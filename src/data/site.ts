@@ -29,13 +29,17 @@ export const siteConfig = {
 
 /** Header navigation — every item scrolls to a section of the single page. */
 export const mainNav: NavItem[] = [
+  { label: "Home", section: "top" },
   { label: "About", section: "about" },
-  { label: "Why Us", section: "why-us" },
   { label: "Services", section: "services" },
-  { label: "Process", section: "process" },
-  { label: "Projects", section: "projects" },
-  { label: "Testimonials", section: "testimonials" },
-  { label: "Contact", section: "contact" },
+  {
+    label: "Projects",
+    section: "projects",
+    children: [
+      { label: "Ongoing Projects", status: "ongoing" },
+      { label: "Completed Projects", status: "completed" },
+    ],
+  },
 ];
 
-export const quoteCta: { label: string; section: SectionId } = { label: "Get a Quote", section: "contact" };
+export const quoteCta: { label: string; section: SectionId } = { label: "Contact Us", section: "contact" };

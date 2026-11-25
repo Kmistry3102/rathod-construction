@@ -5,6 +5,7 @@ import { useCallback, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { MapPin } from "lucide-react";
 import { easeOutExpo } from "@/components/motion/easing";
+import { useProjectFilter } from "@/features/projects/projectFilter";
 import type { Project } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -17,14 +18,21 @@ const pad = (value: number) => String(value).padStart(2, "0");
  * them. Advances when the active thumbnail's progress line fills; hovering or
  * focusing pauses it, and it stays put for reduced motion. Swipe on touch.
  */
-export function ProjectsShowcase({ projects, heading }: { projects: Project[]; heading: ReactNode }) {
-  const [active, setActive] = useState(0);
+export function ProjectsShowcase({ projects: allProjects, heading }: { projects: Project[]; heading: ReactNode }) {
+  const filter = useProjectFilter();
+  const projects = allProjects.filter((project) => project.status === filter);
+  // The selection belongs to one filter; switching filters starts again at the first project.
+  const [selection, setSelection] = useState({ filter, index: 0 });
+  const active = selection.filter === filter ? selection.index : 0;
   const [paused, setPaused] = useState(false);
   const reduceMotion = useReducedMotion();
   const total = projects.length;
   const current = projects[active];
 
-  const go = useCallback((step: number) => setActive((i) => (i + step + total) % total), [total]);
+  const setActive = useCallback((index: number) => setSelection({ filter, index }), [filter]);
+  const go = useCallback((step: number) => setActive((active + step + total) % total), [active, total, setActive]);
+
+  if (!current) return heading;
 
   return (
     <div
@@ -97,6 +105,10 @@ export function ProjectsShowcase({ projects, heading }: { projects: Project[]; h
             >
               <span className="inline-flex items-center rounded-full border border-white/30 px-3 py-1 text-[0.62rem] font-semibold tracking-[0.24em] uppercase backdrop-blur-sm">
                 {current.category}
+                <span aria-hidden className="mx-2 text-white/40">·</span>
+                <span className={current.status === "ongoing" ? "text-orange" : undefined}>
+                  {current.status === "ongoing" ? "Ongoing" : "Completed"}
+                </span>
               </span>
               <h3 className="mt-4 max-w-2xl font-display text-[1.75rem] leading-[1.1] font-normal tracking-[-0.025em] sm:text-[2.5rem] lg:text-[3rem]">
                 {current.title}
@@ -109,7 +121,7 @@ export function ProjectsShowcase({ projects, heading }: { projects: Project[]; h
                 </div>
                 <span aria-hidden className="hidden h-3 w-px bg-white/30 sm:block" />
                 <div className="flex items-center gap-2">
-                  <dt className="text-white/50">Completed</dt>
+                  <dt className="text-white/50">{current.status === "completed" ? "Completed" : "Handover"}</dt>
                   <dd className="tabular-nums">{current.year}</dd>
                 </div>
               </dl>
@@ -119,7 +131,12 @@ export function ProjectsShowcase({ projects, heading }: { projects: Project[]; h
       </motion.div>
 
       {/* Thumbnail strip */}
-      <div className="mt-4 grid grid-cols-6 gap-2 sm:mt-5 sm:gap-4" role="group" aria-label="Choose project">
+      <div
+        className="mt-4 grid gap-2 sm:mt-5 sm:gap-4"
+        style={{ gridTemplateColumns: `repeat(${Math.max(total, 4)}, minmax(0, 1fr))` }}
+        role="group"
+        aria-label="Choose project"
+      >
         {projects.map((project, index) => {
           const selected = index === active;
           return (
@@ -135,7 +152,7 @@ export function ProjectsShowcase({ projects, heading }: { projects: Project[]; h
                 {index < active && <span className="absolute inset-0 bg-white/50" />}
                 {selected && (
                   <span
-                    key={active}
+                    key={`${filter}-${active}`}
                     className={cn("absolute inset-0 origin-left bg-orange", !reduceMotion && "animate-progress")}
                     onAnimationEnd={() => go(1)}
                     style={{

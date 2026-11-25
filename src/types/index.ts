@@ -4,6 +4,8 @@ export type SectionId = "top" | "about" | "mission" | "services" | "projects" | 
 export interface NavItem {
   label: string;
   section: SectionId;
+  /** Dropdown entries; each opens the section filtered to that project status. */
+  children?: { label: string; status: ProjectStatus }[];
 }
 
 export interface ImageAsset {
@@ -32,11 +34,15 @@ export interface Service {
 
 export type ProjectCategory = "Residential" | "Commercial" | "Interiors" | "Industrial";
 
+export type ProjectStatus = "completed" | "ongoing";
+
 export interface Project {
   slug: string;
   title: string;
   category: ProjectCategory;
+  status: ProjectStatus;
   location: string;
+  /** Year finished, or the expected handover year for ongoing work. */
   year: number;
   image: ImageAsset;
 }

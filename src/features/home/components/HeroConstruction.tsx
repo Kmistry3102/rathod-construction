@@ -14,15 +14,16 @@ const REST_Y = JIB_Y + 34;
 const floorTop = (index: number) => GROUND_Y - FLOOR_H * (index + 1);
 
 const easeInOutSine = [0.37, 0, 0.63, 1] as const;
-const line = "var(--brand-ivory)";
-const faint = "rgb(250 248 244 / 0.35)";
+const line = "var(--brand-navy-deep)";
+const faint = "rgb(16 51 66 / 0.35)";
 const orange = "var(--brand-orange)";
-const panel = "var(--brand-navy-deep)";
+/** Fill behind solid shapes: the page's own ivory, so they read as cut-outs. */
+const panel = "var(--brand-ivory)";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Hero illustration: a blueprint-style building site on a fine drafting grid.
+ * Hero illustration: a line-drawn building site set straight on the page.
  * A tower crane lowers one slab at a time onto the building, a flag tops it
  * out, then the site clears and it starts again. Reduced-motion visitors see
  * the finished building, still.
@@ -70,17 +71,8 @@ export function HeroConstruction() {
   const done = built === FLOORS;
 
   return (
-    <div
-      aria-hidden
-      className="absolute inset-0 bg-navy-deep"
-      style={{
-        backgroundImage:
-          "linear-gradient(rgb(250 248 244 / 0.07) 1px, transparent 1px), linear-gradient(90deg, rgb(250 248 244 / 0.07) 1px, transparent 1px), linear-gradient(rgb(250 248 244 / 0.035) 1px, transparent 1px), linear-gradient(90deg, rgb(250 248 244 / 0.035) 1px, transparent 1px)",
-        backgroundSize: "80px 80px, 80px 80px, 16px 16px, 16px 16px",
-        backgroundPosition: "center bottom",
-      }}
-    >
-      <svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMax meet" className="absolute inset-0 h-full w-full" fill="none">
+    <div aria-hidden className="absolute inset-0">
+      <svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMax meet" className="absolute inset-0 h-full w-full -scale-x-100 sm:scale-x-100" fill="none">
         {/* Ground with dimension ticks */}
         <path d={`M20 ${GROUND_Y} H280`} stroke={line} strokeWidth={1.2} />
         {[40, 80, 120, 160, 200, 240].map((x) => (
@@ -126,7 +118,7 @@ export function HeroConstruction() {
                     y={y + 9}
                     width={14}
                     height={14}
-                    fill={(i * 3 + w) % 5 === 2 ? orange : "rgb(250 248 244 / 0.22)"}
+                    fill={(i * 3 + w) % 5 === 2 ? orange : "rgb(16 51 66 / 0.14)"}
                   />
                 ))}
               </motion.g>

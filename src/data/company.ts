@@ -1,20 +1,9 @@
 import type { Highlight, ProcessStep } from "@/types";
 
-export const missionVision = [
-  {
-    title: "Our mission",
-    description: "Build spaces of lasting value — honestly priced, carefully made and delivered as promised.",
-  },
-  {
-    title: "Our vision",
-    description: "To be the builder families and businesses across India trust first.",
-  },
-];
-
 export const whyChooseUs: Highlight[] = [
   { word: "Quality", caption: "Every detail checked." },
   { word: "Time", caption: "Schedules kept." },
-  { word: "Clarity", caption: "Itemised, honest costs." },
+  { word: "Strategy", caption: "Planned before we build." },
   { word: "Trust", caption: "One team, start to end." },
 ];
 

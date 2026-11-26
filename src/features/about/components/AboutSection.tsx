@@ -9,7 +9,7 @@ import { siteConfig } from "@/data/site";
 /** About: a tall studio photograph beside the studio's story. */
 export function AboutSection() {
   return (
-    <Section id="about" tone="white" fullHeight={false} aria-labelledby="about-heading" className="border-t border-line">
+    <Section id="about" tone="white" aria-labelledby="about-heading" className="border-t border-line">
       <div className="grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-16">
         {/* Studio photograph with a quiet founding caption */}
         <div className="hidden sm:block lg:col-span-5">

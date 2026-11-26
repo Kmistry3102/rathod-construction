@@ -1,5 +1,5 @@
 import type { ComponentProps, ReactNode } from "react";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { SectionLink } from "@/components/navigation/SectionLink";
 import { cn } from "@/lib/utils";
 import type { SectionId } from "@/types";
@@ -72,53 +72,5 @@ export function Button({ variant = "primary", size = "md", className, withArrow,
       <span className="inline-flex items-center gap-2">{children}</span>
       {withArrow && <Arrow />}
     </button>
-  );
-}
-
-type TextLinkProps = { children: ReactNode; className?: string } & (
-  | { section: SectionId; href?: never }
-  | { href: string; section?: never }
-);
-
-/** Understated text link with a drawn underline and a moving arrow. */
-export function TextLink({ children, className, ...target }: TextLinkProps) {
-  const external = target.href?.startsWith("http");
-  const Icon = external ? ArrowUpRight : ArrowRight;
-  const classes = cn(
-    "group inline-flex items-center gap-2.5 text-sm font-medium text-navy-deep",
-    className,
-  );
-  const content = (
-    <>
-      <span className="relative pb-1">
-        {children}
-        <span aria-hidden className="absolute inset-x-0 bottom-0 h-px bg-line-strong" />
-        <span
-          aria-hidden
-          className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-orange transition-transform duration-500 ease-premium group-hover:scale-x-100"
-        />
-      </span>
-      <Icon
-        aria-hidden
-        strokeWidth={1.75}
-        className={cn(
-          "size-4 transition-transform duration-500 ease-premium",
-          external ? "group-hover:translate-x-0.5 group-hover:-translate-y-0.5" : "group-hover:translate-x-1",
-        )}
-      />
-    </>
-  );
-
-  if (target.section) {
-    return (
-      <SectionLink section={target.section} className={classes}>
-        {content}
-      </SectionLink>
-    );
-  }
-  return (
-    <a href={target.href} className={classes} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
-      {content}
-    </a>
   );
 }

@@ -35,7 +35,7 @@ export function ServicesAccordion({ services }: { services: AccordionService[] }
   };
 
   return (
-    <ul className="flex h-[34rem] flex-col gap-2 sm:h-[38rem] lg:h-[min(62svh,34rem)] lg:flex-row">
+    <ul className="flex h-164 flex-col gap-2 sm:h-180 lg:h-[min(62svh,34rem)] lg:flex-row">
       {services.map((service, index) => {
         const open = index === active;
         const number = String(index + 1).padStart(2, "0");
@@ -44,8 +44,8 @@ export function ServicesAccordion({ services }: { services: AccordionService[] }
             key={service.slug}
             onMouseEnter={() => setActive(index)}
             className={cn(
-              "relative min-h-0 min-w-0 overflow-hidden rounded-[12px] bg-navy-deep transition-[flex-grow] duration-700 ease-premium",
-              open ? "grow-[6] lg:grow-[5]" : "grow",
+              "relative min-h-0 min-w-0 overflow-hidden rounded-xl bg-navy-deep transition-[flex-grow] duration-700 ease-premium",
+              open ? "grow-9 lg:grow-5" : "grow",
             )}
             style={{ flexBasis: 0 }}
           >
@@ -56,7 +56,7 @@ export function ServicesAccordion({ services }: { services: AccordionService[] }
               sizes="(min-width: 1024px) 50vw, 100vw"
               className={cn(
                 "object-cover transition-[scale,filter] duration-1000 ease-premium",
-                open ? "scale-100 grayscale-0" : "scale-110 grayscale-[60%]",
+                open ? "scale-100 grayscale-0" : "scale-110 grayscale-60",
               )}
             />
             {/* Shade: flat when collapsed, a bottom gradient when open so the photo shows */}
@@ -84,7 +84,7 @@ export function ServicesAccordion({ services }: { services: AccordionService[] }
               onClick={() => setActive(index)}
               onFocus={() => setActive(index)}
               onKeyDown={onKeyDown}
-              className="absolute inset-0 z-10 cursor-pointer rounded-[12px] focus-visible:outline-offset-[-6px] focus-visible:outline-white"
+              className="absolute inset-0 z-10 cursor-pointer rounded-xl focus-visible:outline-offset-[-6px] focus-visible:outline-white"
             >
               <span className="sr-only">{service.title}</span>
             </button>
@@ -98,7 +98,7 @@ export function ServicesAccordion({ services }: { services: AccordionService[] }
               )}
             >
               <span className="font-display text-xs text-orange">{number}</span>
-              <span className="truncate font-display text-base tracking-[-0.01em] lg:rotate-180 lg:text-lg lg:[writing-mode:vertical-rl]">
+              <span className="truncate font-display text-sm sm:text-base tracking-[-0.01em] lg:rotate-180 lg:text-lg lg:[writing-mode:vertical-rl]">
                 {service.shortTitle}
               </span>
             </div>
@@ -107,19 +107,15 @@ export function ServicesAccordion({ services }: { services: AccordionService[] }
             <div
               id={`${baseId}-body-${index}`}
               className={cn(
-                "pointer-events-none absolute inset-x-0 bottom-0 flex flex-col p-5 text-white transition-[opacity,translate] duration-700 ease-premium sm:p-7 lg:w-[30rem] lg:p-8",
+                "pointer-events-none absolute inset-x-0 bottom-0 flex flex-col p-5 text-white transition-[opacity,translate] duration-700 ease-premium sm:p-7 lg:w-120 lg:p-8",
                 open ? "translate-y-0 opacity-100 delay-200" : "translate-y-4 opacity-0",
               )}
             >
-              <span className="flex items-center gap-3 font-display text-xs text-white/70">
-                <span className="text-orange">{number}</span>
-                <span aria-hidden className="h-px w-8 bg-white/40" />
-                <span>/ {String(services.length).padStart(2, "0")}</span>
-              </span>
-              <h3 className="mt-4 font-display text-[1.375rem] leading-[1.2] font-normal tracking-[-0.02em] sm:text-[1.75rem]">
+              <span className="font-display text-xs text-orange">{number}</span>
+              <h3 className="mt-3 font-display text-[1.2rem] leading-[1.2] font-normal tracking-[-0.02em] sm:text-[1.75rem]">
                 {service.title}
               </h3>
-              <p className="mt-2 max-w-sm text-[0.95rem] leading-[1.65] text-white/75">{service.summary}</p>
+              <p className="mt-2 max-w-sm text-[0.85rem] leading-[1.6] sm:text-[0.95rem] sm:leading-[1.65] text-white/75">{service.summary}</p>
             </div>
 
             <ArrowUpRight

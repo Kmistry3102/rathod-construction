@@ -19,7 +19,7 @@ const headline = [
 export function HeroSection() {
   return (
     <section id="top" aria-labelledby="hero-heading" className={`${fullScreen} scroll-mt-(--header-height) bg-ivory`}>
-      <Container className="grid items-center gap-12 py-12 sm:py-16 lg:grid-cols-12 lg:py-10 lg:gap-10">
+      <Container className="grid items-center gap-8 py-12 sm:gap-12 sm:py-16 lg:grid-cols-12 lg:py-10 lg:gap-10">
         <div className="lg:col-span-7">
           <Reveal onMount y={8}>
             <Eyebrow className="text-xs! tracking-[0.28em]! text-slate! sm:text-sm!">Rathod Construction</Eyebrow>
@@ -49,9 +49,9 @@ export function HeroSection() {
         </div>
 
         {/* Construction animation */}
-        <Reveal onMount delay={0.35} y={28} className="hidden sm:block lg:col-span-5">
-          <div className="relative mx-auto w-full max-w-90 lg:mr-0 lg:max-w-96">
-            <div className="relative aspect-3/4 overflow-hidden rounded-t-full rounded-b-xl bg-navy-deep lg:aspect-auto lg:h-[min(42rem,calc(100svh-var(--header-height)-7rem))]">
+        <Reveal onMount delay={0.35} y={28} className="-order-1 lg:order-0 lg:col-span-5">
+          <div className="relative mr-auto w-full max-w-38 sm:mx-auto sm:max-w-md lg:mr-0 lg:max-w-104">
+            <div className="relative aspect-3/4 lg:aspect-auto lg:h-[min(34rem,calc(100svh-var(--header-height)-7rem))]">
               <HeroConstruction />
             </div>
           </div>
